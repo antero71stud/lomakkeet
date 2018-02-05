@@ -44,6 +44,19 @@ class App extends React.Component {
     })
   }
 
+  deletePerson = (event) => {
+    console.log('delete painettu')
+    console.log(event.target.id)
+    personService.deletePerson(event.target.id)
+    .then(response => {
+      console.log(response.status)
+      personService.getAll()
+      .then(response => {
+        this.setState({ persons: response.data })
+      })
+    })
+  }
+
   componentDidMount() {
     console.log('will mount')
     personService.getAll()
@@ -98,7 +111,7 @@ this.state.persons.filter(p => p.name.toLowerCase().indexOf(this.state.filter.to
         <Otsikko otsikko='Numerot' />
         <tbody>
        {personsList
-         .map(person => <Person key={person.id} person={person} />)}
+         .map(person => <Person key={person.id} person={person} command={this.deletePerson}/>)}
       </tbody>
       </div>
     )
