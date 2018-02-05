@@ -19,6 +19,16 @@
       "name": "Lea Kutvonen",
       "number": "040-123456",
       "id": 4
+    },
+    {
+      "name": "Antero Oikkonen",
+      "number": "09-333",
+      "id": 5
+    },
+    {
+      "name": "Tiina Ketola",
+      "number": "90-3333",
+      "id": 6
     }
   ]
 }

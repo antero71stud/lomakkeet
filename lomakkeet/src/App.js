@@ -1,6 +1,7 @@
 import React from 'react';
 import Person from './components/Person'
 import Otsikko from './components/Otsikko'
+import personService from './services/Persons'
 
 class App extends React.Component {
   constructor(props) {
@@ -8,7 +9,7 @@ class App extends React.Component {
     this.state = {
       persons: [
         { name: 'Arto Hellas',
-          phoneNumber: '050-34567',
+          number: '050-34567',
           id: 1
        }
       ],
@@ -24,7 +25,7 @@ class App extends React.Component {
 
     const personObject = {
       name: this.state.newName,
-      phoneNumber: this.state.newPhoneNumber,
+      number: this.state.newPhoneNumber,
       id: this.state.persons.length + 1
     }  
     console.log('personObject ',personObject)
@@ -34,12 +35,22 @@ class App extends React.Component {
     this.state.persons : 
     this.state.persons.concat(personObject)
 
+    personService.create(personObject)
 
     this.setState({
       persons,
       newName: '',
       newPhoneNumber: ''
     })
+  }
+
+  componentDidMount() {
+    console.log('will mount')
+    personService.getAll()
+      .then(response => {
+        console.log('promise fulfilled')
+        this.setState({ persons: response.data })
+      })
   }
 
   handlePersonChange = (event) => {
