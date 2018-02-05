@@ -1,7 +1,9 @@
 import React from 'react';
 import Person from './components/Person'
 import Otsikko from './components/Otsikko'
+import Notification from './components/Notification'
 import personService from './services/Persons'
+import './persons.css'
 
 class App extends React.Component {
   constructor(props) {
@@ -15,34 +17,68 @@ class App extends React.Component {
       ],
       newName: '',
       newPhoneNumber: '',
-      filter: ''
+      filter: '',
+      success: null,
+      error: null
     }
   }
 
   addPerson = (event) => {
     event.preventDefault()
     
+   console.log('persons ',this.state.persons)
+
+  
+
+    var max = this.state.persons.reduce(function(a, b) {
+      return Math.max(a.id, b.id);
+     })
+
+  console.log('max ',max)
+
+  max = isNaN(max) ? this.state.persons.length+5 : max
+
+  console.log('max ',max)
 
     const personObject = {
       name: this.state.newName,
       number: this.state.newPhoneNumber,
-      id: this.state.persons.length + 1
+      id: max + 1
     }  
     console.log('personObject ',personObject)
 
 
+    const len = this.state.persons.length
     const persons = this.state.persons.some(person => person.name  === personObject.name) ?
     this.state.persons : 
     this.state.persons.concat(personObject)
 
-    personService.create(personObject)
+    const success = 
+         persons.length === len ? null : 'Henkilön '+personObject.name+' lisääminen onnistui'
+
+    console.log('success ',success)
+
+    if (success!==null)
+         personService.create(personObject)
+
+    console.log('persons ',persons)
 
     this.setState({
       persons,
       newName: '',
-      newPhoneNumber: ''
+      newPhoneNumber: '',
+      success: success
     })
+    this.delayNotification(2000)
   }
+
+  delayNotification = (timeout) => {
+    setTimeout(() => {
+      this.setState({success: null,
+      error: null})
+    }, timeout)
+  }
+
 
   deletePerson = (event) => {
     console.log('delete painettu')
@@ -52,9 +88,11 @@ class App extends React.Component {
       console.log(response.status)
       personService.getAll()
       .then(response => {
-        this.setState({ persons: response.data })
+        this.setState({ persons: response.data,
+                    success: 'henkilön poisto onnistui' })
       })
     })
+    this.delayNotification(2000)
   }
 
   componentDidMount() {
@@ -90,11 +128,12 @@ this.state.persons.filter(p => p.name.toLowerCase().indexOf(this.state.filter.to
     return (
       <div>
         <Otsikko otsikko='Puhelinluettelo'/>
+        <Notification message={this.state.success}/>
         <div>
           rajaa näytettäviä <input onChange={this.handleFilter} /> 
           </div>
 
-<Otsikko otsikko='Lisää nimi' />
+        <Otsikko otsikko='Lisää nimi' />
         <form onSubmit={this.addPerson}>
           <div>
             nimi: <input 
