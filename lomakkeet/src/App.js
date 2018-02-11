@@ -9,12 +9,7 @@ class App extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      persons: [
-        { name: 'Arto Hellas',
-          number: '050-34567',
-          id: 1
-       }
-      ],
+      persons: [],
       newName: '',
       newPhoneNumber: '',
       filter: '',
@@ -26,50 +21,33 @@ class App extends React.Component {
   addPerson = (event) => {
     event.preventDefault()
     
-   console.log('persons ',this.state.persons)
-
-  
-
-    var max = this.state.persons.reduce(function(a, b) {
-      return Math.max(a.id, b.id);
-     })
-
-  console.log('max ',max)
-
-  max = isNaN(max) ? this.state.persons.length+5 : max
-
-  console.log('max ',max)
+    console.log('persons ',this.state.persons)
 
     const personObject = {
       name: this.state.newName,
-      number: this.state.newPhoneNumber,
-      id: max + 1
+      number: this.state.newPhoneNumber
     }  
     console.log('personObject ',personObject)
+    
+    const persons = this.state.persons.concat(personObject)
 
+    const res = personService.create(personObject)
+    //res.data
 
-    const len = this.state.persons.length
-    const persons = this.state.persons.some(person => person.name  === personObject.name) ?
-    this.state.persons : 
-    this.state.persons.concat(personObject)
-
-    const success = 
-         persons.length === len ? null : 'Henkilön '+personObject.name+' lisääminen onnistui'
-
-    console.log('success ',success)
-
-    if (success!==null)
-         personService.create(personObject)
-
-    console.log('persons ',persons)
+    //console.log('response ',res.data)
 
     this.setState({
       persons,
       newName: '',
-      newPhoneNumber: '',
-      success: success
+      newPhoneNumber: ''
     })
     this.delayNotification(2000)
+  }
+
+
+  getPersons = () => {
+    const persons = personService.getAll()
+    console.log('persons',persons)
   }
 
   delayNotification = (timeout) => {
@@ -95,12 +73,15 @@ class App extends React.Component {
     this.delayNotification(2000)
   }
 
+
+
   componentDidMount() {
-    console.log('will mount')
+    console.log('did mount')
     personService.getAll()
       .then(response => {
         console.log('promise fulfilled')
-        this.setState({ persons: response.data })
+        this.setState({ persons: response })
+        console.log('response data ',response)
       })
   }
 
